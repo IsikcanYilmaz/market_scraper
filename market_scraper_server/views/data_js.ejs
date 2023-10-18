@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+		<select name="market_dropdown" id="market_dropdown">
+			<%- markets %>
+		</select>
+		<select name="date_dropdown" id="date_dropdown">
+			<%- dates %>
+		</select>
+		<select name="category_dropdown" id="category_dropdown">
+			<option id="category_all"> * </option>
+			<%- categories %>
+		</select>
+		<button type="button" id="home_go_button" onclick="goClicked()">
+			GO
+		</button>
+  </body>
+	<script>
+		function goClicked(){ 
+			var market = document.getElementById("market_dropdown").value;
+			var date = document.getElementById("date_dropdown").value;
+			var category = document.getElementById("category_dropdown").value;
+			window.location.href = `/graph?market=` + market + `&date=` + date + `&category=` + category;
+		}
+	</script>
+<h1> <%- market %> <%- date %> </h1>
+<div id="visualization"></div>
+
+<script src="https://visjs.github.io/vis-timeline/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<script>
+var container = document.getElementById("visualization");
+
+// LABELS
+
+var label1 = {
+  content: "Label 1 (with offset)",
+  xOffset: 20,
+  yOffset: 20,
+};
+
+var label2 = {
+  content: "Label 2",
+};
+
+var label3 = {
+  content: "Label 3",
+};
+
+// ITEMS
+var items = [
+<%- items %>
+];
+if (items == [])
+{
+	// TODO mock items
+}
+
+// GROUPS
+var groups = new vis.DataSet();
+groups.add({
+  id: 1,
+	className: "product",
+  content:
+    "Only draw items with labels. Make the data point bigger and a square.",
+  options: {
+    drawPoints: function group1Renderer(item, group, graph2d) {
+      if (item.label == null) {
+        return false;
+      }
+      return {
+        style: "square",
+        size: 15,
+      };
+    },
+  },
+});
+
+groups.add({
+  id: 2,
+	className: "product",
+  content:
+    "Draw according to the Graph2d callback, but make it every datapoint square one.",
+  options: {
+    drawPoints: {
+      style: "square",
+			color: "red"
+    },
+  },
+});
+
+groups.add({
+  id: 3,
+  content:
+    "I want to render datapoints with no labels. Screw the graph2d options. Except the style/size should be according to the graph2d option.",
+  options: {
+    drawPoints: function (item, group, graph2d) {
+      return item.label == null;
+    },
+  },
+});
+
+var dataset = new vis.DataSet(items);
+var options = {
+  style: "bar",
+	height: "800px",
+  drawPoints: {
+    onRender: function (item, group, graph2d) {
+      return item.label != null;
+    },
+    style: "circle",
+  },
+};
+
+var graph2d = new vis.Graph2d(container, dataset, groups, options);
+</script>
+<button id="BACK" onclick="graphBackButtonClicked()"> BACK </button>
+<script>
+function graphBackButtonClicked()
+{
+	window.location.href = "/";
+}
+</script>
+
