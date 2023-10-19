@@ -20,11 +20,6 @@ app.use('/scripts', express.static(__dirname + '/scripts/'));
 
 let prepStr = "";
 
-function getTodayDateStr()
-{
-
-}
-
 function getListOfMarkets()
 {
 	var query = "SELECT DISTINCT market FROM products";
@@ -126,7 +121,7 @@ for (i in categories)
 	console.log(categories[i]);
 	categoriesHtml += `<option id="category_` + categories[i] + `">` + categories[i] + `</option>`;
 }
-console.log(categoriesHtml);
+// console.log(categoriesHtml);
 
 /* HOME PAGE */
 home = (req, res) => {

@@ -6,7 +6,7 @@ import json
 import sys, os
 from datetime import datetime
 
-JSON_DIR = "/Users/isikcanyilmaz/KODMOD/market_scraper/jsons"
+JSON_DIR = "/home/jon/KODMOD/market_scraper/jsons"
 DATABASE_NAME = "products.db"
 
 CREATE_TABLE_SQL = '''
