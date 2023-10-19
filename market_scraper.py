@@ -10,10 +10,11 @@ import time
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-URLS = {'a101':{'base':'https://www.a101.com.tr/market',
-                'subs':['temel-gida', 'atistirmalik', 'ev-bakim-temizlik', 'icecek', 'ambalaj-malzemeleri', 'kahvaltilik-sut-urunleri', 'saglikli-yasam-urunleri', 'meyve-sebze']},
-        'sok':{},
-        'migros':{'base':'https://www.migros.com.tr/',
+URLS = {'a101'  : {'base':'https://www.a101.com.tr/market',
+                  'subs':['temel-gida', 'atistirmalik', 'ev-bakim-temizlik', 'icecek', 'ambalaj-malzemeleri', 'kahvaltilik-sut-urunleri', 'saglikli-yasam-urunleri', 'meyve-sebze']},
+        'sok'   : {'base':'https://www.sokmarket.com.tr/',
+                  'subs':['meyve-sebze-c-1396', 'et-tavuk-sarkuteri-c-1242', 'sut-ve-sut-urunleri-c-1244', 'kahvaltilik-c-1245', 'ekmek-pastane-c-1249', 'dondurulmus-urunler-c-1914', 'yemeklik-malzemeler-c-1243', 'atistirmalik-c-1885', 'icecek-c-1247', 'kisisel-bakim-kozmetik-c-1250', 'anne-bebek-cocuk-c-1743', 'temizlik-c-1248', 'kagit-urunleri-c-1915', 'evcil-dostlar-c-1947', 'elektronik-c-1251', 'giyim-ayakkabi-aksesuar-c-1893', 'ev-yasam-c-1897']},
+        'migros': {'base':'https://www.migros.com.tr/',
                   'subs':['meyve-sebze-c-2', 'et-tavuk-balik-c-3', 'sut-kahvaltilik-c-4', 'temel-gida-c-5', 'meze-hazir-yemek-donuk-c-7d', 'firin-pastane-c-7e', 'dondurma-c-41b', 'atistirmalik-c-113fb', 'icecek-c-6', 'deterjan-temizlik-c-7', 'kagit-islak-mendil-c-8d', 'kisisel-bakim-kozmetik-saglik-c-8', 'bebek-c-9', 'ev-yasam-c-a', 'kitap-kirtasiye-oyuncak-c-118ec', 'cicek-c-502', 'pet-shop-c-a0', 'elektronik-c-a6']}
         }
 
@@ -26,7 +27,7 @@ class Migros_Scraper():
     def __init__(self):
         self.name = "migros"
         self.baseUrl = URLS[self.name]['base']
-        self.subs = URLS[self.subs]['subs']
+        self.subs = URLS[self.name]['subs']
         self.currency = 'tl'
         self.currencyChar = CURRENCIES[self.currency]
         self.products = {}
@@ -47,13 +48,29 @@ class Migros_Scraper():
 
 class Sok_Scraper():
     def __init__(self):
-        pass
+        self.name = "sok"
+        self.baseUrl = URLS[self.name]['base']
+        self.subs = URLS[self.name]['subs']
+        self.currency = 'tl'
+        self.currencyChar = CURRENCIES[self.currency]
+        self.products = {}
 
     def operate(self):
-        pass
+        print("[*] Scraping SOK")
+        for sub in self.subs:
+            print(f'[*] Scrapging "{sub}"')
+            initPageUrl = f'{self.baseUrl}/{sub}'
+            print("> ", initPageUrl)
+            initPageHtml = requests.get(initPageUrl)
+            soup = BeautifulSoup(initPageHtml.content, 'html.parser')
+            numPages = len(soup.find_all(class_="js-pagination"))
+            # products = {}
+            # products.update(self.parse(soup))
+            print(soup)
+            # print(products)
 
     def parse(self, soup):
-        pass
+        return soup
 
 class A101_Scraper():
     def __init__(self):
@@ -127,7 +144,9 @@ class A101_Scraper():
 
 def main():
     a101Obj = A101_Scraper()
-    a101Obj.operate()
+    sokObj = Sok_Scraper()
+    # a101Obj.operate()
+    sokObj.operate()
 
 if __name__ == "__main__":
     main()
