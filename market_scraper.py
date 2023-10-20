@@ -145,8 +145,8 @@ class A101_Scraper():
 def main():
     a101Obj = A101_Scraper()
     sokObj = Sok_Scraper()
-    # a101Obj.operate()
-    sokObj.operate()
+    a101Obj.operate()
+    # sokObj.operate()
 
 if __name__ == "__main__":
     main()
