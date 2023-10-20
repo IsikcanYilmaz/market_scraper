@@ -16,6 +16,8 @@ URLS = {'a101'  : {'base':'https://www.a101.com.tr/market',
                   'subs':['meyve-sebze-c-1396', 'et-tavuk-sarkuteri-c-1242', 'sut-ve-sut-urunleri-c-1244', 'kahvaltilik-c-1245', 'ekmek-pastane-c-1249', 'dondurulmus-urunler-c-1914', 'yemeklik-malzemeler-c-1243', 'atistirmalik-c-1885', 'icecek-c-1247', 'kisisel-bakim-kozmetik-c-1250', 'anne-bebek-cocuk-c-1743', 'temizlik-c-1248', 'kagit-urunleri-c-1915', 'evcil-dostlar-c-1947', 'elektronik-c-1251', 'giyim-ayakkabi-aksesuar-c-1893', 'ev-yasam-c-1897']},
         'migros': {'base':'https://www.migros.com.tr/',
                   'subs':['meyve-sebze-c-2', 'et-tavuk-balik-c-3', 'sut-kahvaltilik-c-4', 'temel-gida-c-5', 'meze-hazir-yemek-donuk-c-7d', 'firin-pastane-c-7e', 'dondurma-c-41b', 'atistirmalik-c-113fb', 'icecek-c-6', 'deterjan-temizlik-c-7', 'kagit-islak-mendil-c-8d', 'kisisel-bakim-kozmetik-saglik-c-8', 'bebek-c-9', 'ev-yasam-c-a', 'kitap-kirtasiye-oyuncak-c-118ec', 'cicek-c-502', 'pet-shop-c-a0', 'elektronik-c-a6']}
+        'bim'   : {'base':'', 
+                   'subs':''}
         }
 
 CURRENCIES = {'tl':'₺'}
