@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+'''
+D E P R I C A T E D
+'''
+
 import sys, os, json, fnmatch, codecs
 
 JSON_DIRNAME = "jsons"

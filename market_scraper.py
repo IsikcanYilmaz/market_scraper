@@ -14,6 +14,8 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+JSON_DIRNAME = "jsons"
+
 URLS = {'a101'  : {'base':'https://www.a101.com.tr/market',
                   'subs':['temel-gida', 'atistirmalik', 'ev-bakim-temizlik', 'icecek', 'ambalaj-malzemeleri', 'kahvaltilik-sut-urunleri', 'saglikli-yasam-urunleri', 'meyve-sebze']},
         'sok'   : {'base':'https://www.sokmarket.com.tr',
@@ -110,15 +112,15 @@ class A101_Scraper():
         print("[*] Scraping A101")
         for sub in self.subs:
             print(f'[*] Scraping "{sub}"')
-            if not sub in self.products:
-                self.products[sub] = {}
+            # if not sub in self.products:
+            #     self.products[sub] = {}
             initPageUrl = f'{self.baseUrl}/{sub}'
             print("> ", initPageUrl)
             initPageHtml = requests.get(initPageUrl, headers=REQ_HEADER)
             soup = BeautifulSoup(initPageHtml.content, 'html.parser')
             numPages = len(soup.find_all(class_="js-pagination"))
             products = {}
-            products.update(self.parse(soup))
+            products.update(self.parse(soup, sub))
             if (numPages > 1):
                 for p in range(2, numPages+1):
                     if (POLITE):
@@ -127,14 +129,14 @@ class A101_Scraper():
                     print("> ", url)
                     html = requests.get(url)
                     soup = BeautifulSoup(html.content, "html.parser")
-                    products.update(self.parse(soup))
-            self.products[sub] = products
+                    products.update(self.parse(soup, sub))
+            self.products.update(products)
         jsonFilename = f'a101_{datetime.today().strftime("%d-%m-%Y")}.json'
-        with codecs.open(jsonFilename, "w", encoding='utf-8') as fp:
+        with codecs.open(f'{JSON_DIRNAME}/{jsonFilename}', "w", encoding='utf-8') as fp:
             json.dump(self.products, fp, ensure_ascii=False)
         print(f'[*] Written to {jsonFilename}')
 
-    def parse(self, soup):
+    def parse(self, soup, sub=None):
         # Get all products' name, price, old price (if exists), picture URL info
         # return in an array of dicts
         productsRaw = soup.find_all(class_="set-product-item")
@@ -163,7 +165,10 @@ class A101_Scraper():
             except KeyError:
                 print("[!] data-src field not found for", name)
                 imageSoup['data-src'] = None
-            products[name] = {'oldPrice':oldPrice, 'currentPrice':currentPrice, 'imageUrl':imageSoup['data-src']} 
+
+            # Get other metadata
+            date = datetime.today().strftime("%d-%m-%Y")
+            products[name] = {'oldPrice':oldPrice, 'currentPrice':currentPrice, 'imageUrl':imageSoup['data-src'], 'market':self.name, 'date':date, 'category':sub} 
             # products.append(productDict)
         return products
 
