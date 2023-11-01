@@ -8,7 +8,7 @@ import traceback
 import json
 import time
 from datetime import datetime
-from requests_html import HTMLSession, AsyncHTMLSession # https://stackoverflow.com/questions/26393231/using-python-requests-with-javascript-pages
+# from requests_html import HTMLSession, AsyncHTMLSession # https://stackoverflow.com/questions/26393231/using-python-requests-with-javascript-pages
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium import webdriver
