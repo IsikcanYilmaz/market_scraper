@@ -153,7 +153,12 @@ class A101_Scraper():
                 print(p)
                 print(f'[!] No current price for {name}! Skipping')
                 continue
-            currentPrice = float(currentPriceSoup.text.replace(self.currencyChar, "").replace(",", "."))
+            
+            try:
+                currentPrice = float(currentPriceSoup.text.replace(self.currencyChar, "").replace(",", "."))
+            except ValueError as e:
+                print(f'[!] bad string to convert to float "{currentPriceSoup.text}". Name: {name}. Skipping')
+                continue 
             
             oldPrice = None
             if (oldPriceSoup is not None):
