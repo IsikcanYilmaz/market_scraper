@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+		<select name="market_dropdown" id="market_dropdown">
+			<%- markets %>
+		</select>
+		<select name="date_dropdown" id="date_dropdown">
+			<%- dates %>
+		</select>
+		<select name="category_dropdown" id="category_dropdown">
+			<option id="category_all"> * </option>
+			<%- categories %>
+		</select>
+		<button type="button" id="home_go_button" onclick="goClicked()">
+			GO
+		</button>
+		<h2>
+			etc text
+		</h2>
+		<p>
+			<%- etctext %>
+		</p>
+  </body>
+	<script>
+		function goClicked(){ 
+			var market = document.getElementById("market_dropdown").value;
+			var date = document.getElementById("date_dropdown").value;
+			var category = document.getElementById("category_dropdown").value;
+			window.location.href = `/graph?market=` + market + `&date=` + date + `&category=` + category;
+		}
+	</script>
+</html>
