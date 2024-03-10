@@ -58,16 +58,16 @@ function getMarketDataByDate(market, category, date)
 	var query = "";
 	if (category == "*")
 	{
-		query = `SELECT * FROM products WHERE (date = '` + date + `') and (market = '` + market + `') ORDER BY category`;
+		query = `SELECT DISTINCT name, currentPrice, oldPrice FROM products WHERE (date = '` + date + `') and (market = '` + market + `') ORDER BY category`;
 	}
 	else
 	{
-		query = `SELECT * FROM products WHERE (date = '` + date + `') and (market = '` + market + `') and (category = '` + category + `') ORDER BY category`;
+		query = `SELECT DISTINCT name, currentPrice, oldPrice FROM products WHERE (date = '` + date + `') and (market = '` + market + `') and (category = '` + category + `') ORDER BY category`;
 	}
 	console.log(query);
 	var statement = dbConnection.prepare(query);
 	var products = statement.all();
-	// console.log(products);
+	console.log(products);
 	var prepStr = ""
 	for (i in products)
 	{
