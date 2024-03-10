@@ -199,7 +199,7 @@ router.get('/graph', function(req, res, next) {
 			"subtitle":subtitle
 			});
 	}
-	else if (reqType == "history")
+	else //if (reqType == "history")
 	{
 		var productName = req.query.productName;
 		console.log("HISTORY", market, productName);
@@ -217,10 +217,10 @@ router.get('/graph', function(req, res, next) {
 			"subtitle":subtitle
 			});
 	}
-	else
-	{
-		res.send("Bad request type!", req.query);
-	}
+	// else
+	// {
+	// 	res.send("Bad request type!", req.query);
+	// }
 });
 
 
