@@ -1,18 +1,12 @@
 var express = require('express');
 var router = express.Router();
-
 const better_sqlite3 = require('better-sqlite3');
-
 const app = express();
-
 const TL_SYMBOL = "₺";
-
 const DATABASE_FILE = "./products.db";
+
 var dbConnection = new better_sqlite3(DATABASE_FILE, {verbose: console.log});
-
 app.use('/scripts', express.static(__dirname + '/scripts/'));
-
-let prepStr = "";
 
 function getListOfMarkets()
 {
@@ -53,21 +47,41 @@ function getListOfCategories(market)
 	return retArr;
 }
 
+function getListOfProducts(market, category)
+{
+	var query = ""
+	if (category == "*")
+	{
+		query = `SELECT DISTINCT name FROM products WHERE (market = '` + market + `') ORDER BY category, name DESC`;
+	}
+	else
+	{
+		query = `SELECT DISTINCT name FROM products WHERE (market = '` + market + `') and (category = '` + category + `') ORDER BY categoryy, name DESC`;
+	}
+	var statement = dbConnection.prepare(query);
+	var names = statement.all();
+	var retArr = [];
+	for (i in names)
+	{
+		retArr.push(names[i].name);
+	}
+	return retArr;
+}
+
 function getMarketDataByDate(market, category, date)
 {
 	var query = "";
 	if (category == "*")
 	{
-		query = `SELECT DISTINCT name, currentPrice, oldPrice FROM products WHERE (date = '` + date + `') and (market = '` + market + `') ORDER BY category`;
+		query = `SELECT DISTINCT name, currentPrice, oldPrice FROM products WHERE (date = '` + date + `') and (market = '` + market + `') ORDER BY category, currentPrice DESC`;
 	}
 	else
 	{
-		query = `SELECT DISTINCT name, currentPrice, oldPrice FROM products WHERE (date = '` + date + `') and (market = '` + market + `') and (category = '` + category + `') ORDER BY category`;
+		query = `SELECT DISTINCT name, currentPrice, oldPrice FROM products WHERE (date = '` + date + `') and (market = '` + market + `') and (category = '` + category + `') ORDER BY currentPrice DESC`;
 	}
-	console.log(query);
+	// console.log(query);
 	var statement = dbConnection.prepare(query);
 	var products = statement.all();
-	console.log(products);
 	var prepStr = ""
 	for (i in products)
 	{
@@ -86,6 +100,33 @@ function getMarketDataByDate(market, category, date)
 		prepStr += productPrepStr;
 	}
 	return prepStr;
+}
+
+function getProductHistory(market, productName)
+{
+	var query = `SELECT DISTINCT name, currentPrice, oldPrice, timestamp FROM products WHERE (market = '` + market + `') and (name = '` + productName + `') ORDER BY timestamp`;
+	console.log(query);
+	var statement = dbConnection.prepare(query);
+	var history = statement.all();
+	var prepStr = ""
+	for (i in history)
+	{
+		var point = history[i];
+		var label1 = {content: point.currentPrice + " " + TL_SYMBOL, xOffset:0, yOffset:0};
+		var pointPrepStr = ""
+		var timestamp = point.timestamp;
+		if (point.oldPrice != "None")
+		{
+			pointPrepStr += (`{group:2, x:\"` + timestamp + `\", y: ` + point.currentPrice + `},`);
+			pointPrepStr += (`{group:1, x:\"` + timestamp + `\", y: ` + point.oldPrice + `, label: ` + JSON.stringify(label1) + `},`);
+		}
+		else
+		{
+			pointPrepStr += (`{group:2, x:\"` + timestamp + `\", y: ` + point.currentPrice + `, label: `+ JSON.stringify(label1) + `},`);
+		}
+		prepStr += pointPrepStr;
+	}
+	return prepStr; 
 }
 
 function prepRenderData()
@@ -114,35 +155,75 @@ for (i in categories)
 	console.log(categories[i]);
 	categoriesHtml += ` <option id="category_` + categories[i] + `">` + categories[i] + `</option>`;
 }
-// console.log(categoriesHtml);
 
-var etctext = "TEST"
+var productNames = getListOfProducts(markets[0], "*");
+var productNamesHtml = "";
+for (i in productNames)
+{
+	productNamesHtml += ` <option id="product_` + productNames[i] + `">` + productNames[i] + `</option>`;
+}
 
-/* GET home page. */
+var etctext = "" // debug
+
+/* GET HOME PAGE. */
 router.get('/', function(req, res, next) {
 	console.log("HOME");
 	res.render("index.ejs", {"title":"CAKMA CIMRI", 
 		"markets":marketsHtml, 
 		"categories":categoriesHtml, 
 		"dates":datesHtml, 
-		"etctext":"TEST"});
+		"etctext":etctext});
 });
 
-/* TODO GRAPH PAGE */
+/* GET GRAPH PAGE */
 router.get('/graph', function(req, res, next) {
 	console.log("GRAPH", req.query);
+	var reqType = req.query.reqType;
 	var date = req.query.date;
 	var market = req.query.market;
 	var category = req.query.category;
-	var jsonStr = getMarketDataByDate(market, category, date);
-	res.render("graph.ejs", {"items":jsonStr, 
-		"market":market, 
-		"date":date, 
-		"markets":marketsHtml, 
-		"categories":categoriesHtml, 
-		"dates":datesHtml, 
-		"title":"CAKMA CIMRI"});
+	if (reqType == "aggregate")
+	{
+		console.log("AGGREGATE", market, category);
+		var subtitle = market + " " + date + " " + category;
+		var jsonStr = getMarketDataByDate(market, category, date);
+		res.render("graph.ejs", {"items":jsonStr, 
+			"market":market, 
+			"date":date, 
+			"markets":marketsHtml, 
+			"categories":categoriesHtml, 
+			"dates":datesHtml, 
+			"category":category,
+			"productNames":productNamesHtml,
+			"title":"CAKMA CIMRI", 
+			"subtitle":subtitle
+			});
+	}
+	else if (reqType == "history")
+	{
+		var productName = req.query.productName;
+		console.log("HISTORY", market, productName);
+		var subtitle = market + " " + productName;
+		var jsonStr = getProductHistory(market, productName);
+		res.render("graph.ejs", {"items":jsonStr,
+			"market":market, 
+			"date":date, 
+			"markets":marketsHtml, 
+			"categories":categoriesHtml, 
+			"dates":datesHtml, 
+			"category":category,
+			"productNames":productNamesHtml,
+			"title":"CAKMA CIMRI",
+			"subtitle":subtitle
+			});
+	}
+	else
+	{
+		res.send("Bad request type!", req.query);
+	}
 });
 
+
+//
 module.exports = router;
 // module.exports = app;
